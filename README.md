@@ -1,8 +1,17 @@
 # ISBI2018_PETCT_Segmentation
 
-This repository contains the code (in TensorFlow) for "[3D fully convolutional networks for co-segmentation of tumors on PET-CT images](https://ieeexplore.ieee.org/abstract/document/8363561/)" paper (ISBI 2018).
+This repository contains the code (in TensorFlow) for "[3D fully convolutional networks for co-segmentation of tumors on PET-CT images](https://ieeexplore.ieee.org/abstract/document/8363561/)" paper (ISBI 2018). 
+
+## Dependencies
+
+- [Python2.7](https://www.python.org/downloads/)
+- [TensorFlow(1.4.0+)](http://www.tensorflow.org)
+- other libraries
 
 ## Citation
+
+If you find this useful, please cite our work as follows:
+
 ```
 @INPROCEEDINGS{zszhong2018isbi_petct,
   author={Z. Zhong and Y. Kim and L. Zhou and K. Plichta and B. Allen and J. Buatti and X. Wu},
@@ -18,12 +27,6 @@ This repository contains the code (in TensorFlow) for "[3D fully convolutional n
   month={April},
 }
 ```
-
-## Dependencies
-
-- [Python2.7](https://www.python.org/downloads/)
-- [TensorFlow(1.4.0+)](http://www.tensorflow.org)
-- other libraries
 
 ## Contacts
 zhongzisha@outlook.com

@@ -2,7 +2,7 @@
 
 This repository contains the code (in TensorFlow) for "[3D fully convolutional networks for co-segmentation of tumors on PET-CT images](https://ieeexplore.ieee.org/abstract/document/8363561/)" paper (ISBI 2018). 
 
-## Predictions on CT/PET
+## CT/PET Segmentation Results on One Patient
 
 ### CT image
 

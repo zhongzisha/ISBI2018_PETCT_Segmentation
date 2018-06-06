@@ -40,6 +40,7 @@ This repository contains the code (in TensorFlow) for "[3D fully convolutional n
 
 - [Python2.7](https://www.python.org/downloads/)
 - [TensorFlow(1.4.0+)](http://www.tensorflow.org)
+- [DLTK](https://dltk.github.io/)
 - other libraries
 
 ## Citation

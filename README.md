@@ -4,35 +4,35 @@ This repository contains the code (in TensorFlow) for "[3D fully convolutional n
 
 ## CT/PET Segmentation Results on One Patient
 
-### CT image
+### 1. CT image
 
 <img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/raw/master/CT.PNG">
 
-### PET_SUV image
+### 2. PET_SUV image
 
 <img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/raw/master/PET_SUV.PNG">
 
-### Ground Truth Segmentation on CT image
+### 3. Ground Truth Segmentation on CT image
 
 <img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/blob/master/CT_Ground%20Truth.PNG">
 
-### Ground Truth Segmentation on PET_SUV image
+### 4. Ground Truth Segmentation on PET_SUV image
 
 <img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/blob/master/PET_Ground%20Truth.PNG">
 
-### Prediction on CT image
+### 5. Prediction on CT image
 
 <img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/blob/master/Prediction_CT.PNG">
 
-### Prediction on PET_SUV image
+### 6. Prediction on PET_SUV image
 
 <img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/blob/master/Prediction_PET.PNG">
 
-### Wrong Predictions on CT image
+### 7. Wrong Predictions on CT image
 
 <img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/blob/master/Prediction_CT_Wrong.PNG">
 
-### Wrong Predictions on PET_SUV image
+### 8. Wrong Predictions on PET_SUV image
 
 <img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/blob/master/Prediction_PET_Wrong.PNG">
 

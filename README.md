@@ -2,6 +2,40 @@
 
 This repository contains the code (in TensorFlow) for "[3D fully convolutional networks for co-segmentation of tumors on PET-CT images](https://ieeexplore.ieee.org/abstract/document/8363561/)" paper (ISBI 2018). 
 
+## Predictions on CT/PET
+
+### CT image
+
+<img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/raw/master/CT.PNG">
+
+### PET_SUV image
+
+<img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/raw/master/PET_SUV.PNG">
+
+### Ground Truth Segmentation on CT image
+
+<img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/blob/master/CT_Ground%20Truth.PNG">
+
+### Ground Truth Segmentation on PET_SUV image
+
+<img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/blob/master/PET_Ground%20Truth.PNG">
+
+### Prediction on CT image
+
+<img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/blob/master/Prediction_CT.PNG">
+
+### Prediction on PET_SUV image
+
+<img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/blob/master/Prediction_PET.PNG">
+
+### Wrong Predictions on CT image
+
+<img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/blob/master/Prediction_CT_Wrong.PNG">
+
+### Wrong Predictions on PET_SUV image
+
+<img align="center" src="https://github.com/zhongzisha/ISBI2018_PETCT_Segmentation/blob/master/Prediction_PET_Wrong.PNG">
+
 ## Dependencies
 
 - [Python2.7](https://www.python.org/downloads/)

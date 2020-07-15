@@ -328,3 +328,257 @@ def myunet3d_bn_crf(name,
     return outputs
 
 
+def myfusionunet2_bn(name,
+                     inputs, 
+           num_classes,
+           phase_train,
+           use_bias=False,
+           kernel_initializer=tf.initializers.variance_scaling(distribution='uniform'),
+           bias_initializer=tf.zeros_initializer(),
+           kernel_regularizer=None,
+           bias_regularizer=None,
+           use_crf=False,
+           args=None):
+    
+    conv_params = {'padding': 'same',
+                   'use_bias': use_bias,
+                   'kernel_initializer': kernel_initializer,
+                   'bias_initializer': bias_initializer,
+                   'kernel_regularizer': kernel_regularizer,
+                   'bias_regularizer': bias_regularizer}
+    deconv_params = {'padding': 'same',
+                     'use_bias': False,
+                     'kernel_initializer': kernel_initializer,
+                     'bias_initializer': bias_initializer,
+                     'kernel_regularizer': kernel_regularizer,
+                     'bias_regularizer': bias_regularizer}
+    
+    ct, pt = tf.split(inputs, [1,1],axis=4)
+    
+    with tf.variable_scope('ct'):
+        x = ct
+        
+        with tf.variable_scope('enc_0'):
+            x = tf.layers.conv3d(x, 32, 3, **conv_params)
+        f1_ct = x
+        
+        with tf.variable_scope('enc_1'):
+            x = tf.layers.conv3d(x, 64, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x) 
+            x = tf.layers.max_pooling3d(x, pool_size=[2,2,2], strides=[2,2,2], padding='same')
+        f2_ct = x 
+    
+        with tf.variable_scope('enc_2'):
+            x = tf.layers.conv3d(x, 128, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x) 
+            x = tf.layers.max_pooling3d(x, pool_size=[2,2,2], strides=[2,2,2], padding='same')
+        f3_ct = x
+    
+        with tf.variable_scope('enc_3'):
+            x = tf.layers.conv3d(x, 256, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x) 
+            x = tf.layers.max_pooling3d(x, pool_size=[2,2,2], strides=[2,2,2], padding='same')
+        f4_ct = x
+    
+        with tf.variable_scope('enc_4'):
+            x = tf.layers.conv3d(x, 512, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x)
+            x = tf.layers.max_pooling3d(x, pool_size=[2,2,2], strides=[2,2,2], padding='same')
+        f5_ct = x
+        
+    with tf.variable_scope('pt'):
+        x = pt
+        
+        with tf.variable_scope('enc_0'):
+            x = tf.layers.conv3d(x, 32, 3, **conv_params)
+        f1_pt = x
+        
+        with tf.variable_scope('enc_1'):
+            x = tf.layers.conv3d(x, 64, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x) 
+            x = tf.layers.max_pooling3d(x, pool_size=[2,2,2], strides=[2,2,2], padding='same')
+        f2_pt = x
+    
+        with tf.variable_scope('enc_2'):
+            x = tf.layers.conv3d(x, 128, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x) 
+            x = tf.layers.max_pooling3d(x, pool_size=[2,2,2], strides=[2,2,2], padding='same')
+        f3_pt = x
+    
+        with tf.variable_scope('enc_3'):
+            x = tf.layers.conv3d(x, 256, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x) 
+            x = tf.layers.max_pooling3d(x, pool_size=[2,2,2], strides=[2,2,2], padding='same')
+        f4_pt = x
+    
+        with tf.variable_scope('enc_4'):
+            x = tf.layers.conv3d(x, 512, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x)
+            x = tf.layers.max_pooling3d(x, pool_size=[2,2,2], strides=[2,2,2], padding='same')
+        f5_pt = x
+        
+    with tf.variable_scope('fusion'):
+        x_fusion_pre = tf.concat([f5_ct, f5_pt], axis=4)
+        x = tf.layers.conv3d(x_fusion_pre, 512, 1, **conv_params)
+        x = tf.layers.batch_normalization(
+            x, training=phase_train)
+        x_fusion_post = tf.nn.relu(x)
+    
+    with tf.variable_scope('ct'):
+        with tf.variable_scope('dec_4'):
+            factor = 2
+            x = tf.layers.conv3d_transpose(x_fusion_post, 512, kernel_size=get_kernel_size(factor), 
+                                           strides=[factor, factor, factor], 
+                                           **deconv_params)
+            x = tf.concat([x, f4_ct, f4_pt], axis=4) # 8x16x16x256
+            x = tf.layers.conv3d(x, 256, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x)
+        print(x.shape)
+            
+        with tf.variable_scope('dec_3'):
+            factor = 2
+            x = tf.layers.conv3d_transpose(x, 256, kernel_size=get_kernel_size(factor), 
+                                           strides=[factor, factor, factor], 
+                                           **deconv_params)
+            x = tf.concat([x,f3_ct, f3_pt], axis=4) # 16x32x32x256
+            x = tf.layers.conv3d(x, 128, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x)
+        print(x.shape)
+        
+        with tf.variable_scope('dec_2'):
+            factor = 2
+            x = tf.layers.conv3d_transpose(x, 128, kernel_size=get_kernel_size(factor), 
+                                           strides=[factor, factor, factor], 
+                                           **deconv_params)
+            x = tf.concat([x,f2_ct, f2_pt], axis=4)
+            x = tf.layers.conv3d(x, 64, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x)
+        print(x.shape)
+        
+        with tf.variable_scope('dec_1'):
+            factor = 2
+            x = tf.layers.conv3d_transpose(x, 64, kernel_size=get_kernel_size(factor), 
+                                           strides=[factor, factor, factor], 
+                                           **deconv_params)
+            x = tf.concat([x,f1_ct, f1_pt], axis=4)
+            x = tf.layers.conv3d(x, 32, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x)
+        print(x.shape)
+            
+        with tf.variable_scope('conv_cls'):
+            logits_ct = tf.layers.conv3d(x, num_classes, 1, padding='same',
+                                 use_bias=True,
+                                 kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
+                                 bias_initializer=tf.constant_initializer(value=0.1),
+                                 kernel_regularizer=tf.contrib.layers.l2_regularizer(5e-4),
+                                 bias_regularizer=tf.contrib.layers.l2_regularizer(5e-4))
+        print(logits_ct.shape)
+        
+    with tf.variable_scope('pt'):
+        with tf.variable_scope('dec_4'):
+            factor = 2
+            x = tf.layers.conv3d_transpose(x_fusion_post, 512, kernel_size=get_kernel_size(factor), 
+                                           strides=[factor, factor, factor], 
+                                           **deconv_params)
+            x = tf.concat([x, f4_pt, f4_ct], axis=4) # 8x16x16x256
+            x = tf.layers.conv3d(x, 256, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x)
+        print(x.shape)
+            
+        with tf.variable_scope('dec_3'):
+            factor = 2
+            x = tf.layers.conv3d_transpose(x, 256, kernel_size=get_kernel_size(factor), 
+                                           strides=[factor, factor, factor], 
+                                           **deconv_params)
+            x = tf.concat([x,f3_pt, f3_ct], axis=4) # 16x32x32x256
+            x = tf.layers.conv3d(x, 128, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x)
+        print(x.shape)
+        
+        with tf.variable_scope('dec_2'):
+            factor = 2
+            x = tf.layers.conv3d_transpose(x, 128, kernel_size=get_kernel_size(factor), 
+                                           strides=[factor, factor, factor], 
+                                           **deconv_params)
+            x = tf.concat([x,f2_pt, f2_ct], axis=4)
+            x = tf.layers.conv3d(x, 64, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x)
+        print(x.shape)
+        
+        with tf.variable_scope('dec_1'):
+            factor = 2
+            x = tf.layers.conv3d_transpose(x, 64, kernel_size=get_kernel_size(factor), 
+                                           strides=[factor, factor, factor], 
+                                           **deconv_params)
+            x = tf.concat([x,f1_pt, f1_ct], axis=4)
+            x = tf.layers.conv3d(x, 32, 3, **conv_params)
+            x = tf.layers.batch_normalization(
+                x, training=phase_train)
+            x = tf.nn.relu(x)
+        print(x.shape)
+            
+        with tf.variable_scope('conv_cls'):
+            logits_pt = tf.layers.conv3d(x, num_classes, 1, padding='same',
+                                 use_bias=True,
+                                 kernel_initializer=tf.truncated_normal_initializer(stddev=0.1),
+                                 bias_initializer=tf.constant_initializer(value=0.1),
+                                 kernel_regularizer=tf.contrib.layers.l2_regularizer(4e-4),
+                                 bias_regularizer=tf.contrib.layers.l2_regularizer(4e-4))
+        print(logits_pt.shape)
+    
+    outputs = {}
+    # Define the outputs
+    outputs['logits_ct'] = logits_ct
+    outputs['logits_pt'] = logits_pt
+
+    with tf.variable_scope('pred_ct'):
+        y_prob = tf.nn.softmax(logits_ct)
+        outputs['y_prob_ct'] = y_prob
+
+        y_ct = tf.argmax(logits_ct, axis=-1) \
+            if num_classes > 1 \
+            else tf.cast(tf.greater_equal(logits_ct[..., 0], 0.5), tf.int32)
+
+        outputs['y_ct'] = y_ct
+        
+    with tf.variable_scope('pred_pt'):
+        y_prob = tf.nn.softmax(logits_pt)
+        outputs['y_prob_pt'] = y_prob
+
+        y_pt = tf.argmax(logits_pt, axis=-1) \
+            if num_classes > 1 \
+            else tf.cast(tf.greater_equal(logits_pt[..., 0], 0.5), tf.int32)
+
+        outputs['y_pt'] = y_pt
+
+    return outputs

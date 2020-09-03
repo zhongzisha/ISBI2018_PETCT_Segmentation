@@ -1,6 +1,21 @@
 # ISBI2018_PETCT_Segmentation
 
-This repository contains the code (in TensorFlow) for "[3D fully convolutional networks for co-segmentation of tumors on PET-CT images](https://ieeexplore.ieee.org/abstract/document/8363561/)" paper (ISBI 2018). Compared to the previous semi-automated methods, this method is highly automated without manually user-defined seeds. **And one extended journal version with much more details is under revision.**
+This repository contains the code (in TensorFlow) for "[3D fully convolutional networks for co-segmentation of tumors on PET-CT images](https://ieeexplore.ieee.org/abstract/document/8363561/)" paper (ISBI 2018). Compared to the previous semi-automated methods, this method is highly automated without manually user-defined seeds. 
+
+**UPDATED**
+
+1. Uploaded the DFCN-CoSeg training and testing code for our extended work published in
+https://aapm.onlinelibrary.wiley.com/doi/abs/10.1002/mp.13331 (MP2018), which provided much details
+compared to the ISBI2018 paper. 
+
+2. Uploaded our previous trained models for `CT-Only`, `PET-Only` and `DFCN-CoSeg` networks studied in 
+MP2018. The models can be downloaded in BaiduYun 
+(https://pan.baidu.com/s/1tCsjfuckkU9IH8O4xewsRQ Password: tfkt).
+
+3. As for now, I cannot install the outdated `tensorflow_gpu==1.4` in my working `Ubuntu 20.04`, 
+so I uploaded two cases of PET-CT images and the testing code using `tensorflow_gpu==2.3`, 
+interested readers can check the `test.sh` script.
+**Please note that we just use the `tensorflow_gpu==2.3` in the testing code, not for training.**
 
 ## CT/PET Segmentation Results on One Patient
 

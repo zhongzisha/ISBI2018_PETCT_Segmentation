@@ -23,6 +23,8 @@ from tensorflow.python.saved_model import loader
 from dltk.io.augmentation import add_gaussian_noise, flip, extract_class_balanced_example_array, elastic_transform
 from dltk.io.preprocessing import whitening
 
+# from crfrnn3d_tf_fortest import *
+
 from myconfig import *
 
 # supports numpy arrays and tensorflow tensors
@@ -156,7 +158,6 @@ def parse_args():
     parser.add_argument("--use_bn", type=int, default=1)
     parser.add_argument("--use_crf", type=int, default=0)
     parser.add_argument("--restore_ckpt_meta", type=str, default='')
-    parser.add_argument("--feat_index", type=int, default=0) # 0: ct, 1: pt
     parser.add_argument('--random_seed', type=int, default=42)
     parser.add_argument('--test_filenames', type=str, default='testForTest0.csv')
     parser.add_argument('--norm_type', type=str, default='nonorm')
@@ -197,11 +198,11 @@ def main():
         batch_mean, batch_var = tf.compat.v1.nn.moments(image_node, axes=[1,2,3], keep_dims=True)
         image_node_new = (image_node - batch_mean) / tf.compat.v1.sqrt(batch_var + 1e-6)
         
-    if args.net_type == 'myunet3d_bn_crf':
-        from myunet3d_basic import myunet3d_bn_crf
-        net_output_ops = myunet3d_bn_crf(
-            name='ct' if args.feat_index==0 else 'pt',
-            inputs=image_node_new[...,args.feat_index][...,tf.compat.v1.newaxis],
+    if args.net_type == 'myfusionunet2_bn':
+        from myunet3d_basic import myfusionunet2_bn
+        net_output_ops = myfusionunet2_bn(
+            name='ctpt',
+            inputs=image_node_new,
             num_classes=NUM_CLASSES,
             phase_train=phase_train,
             use_bias=True,
@@ -211,13 +212,13 @@ def main():
             bias_regularizer=tf.compat.v1.keras.regularizers.l2(1e-4),
             use_crf=args.use_crf,
             args=args)
+
+    pred_ct_op = net_output_ops['y_ct']
+    pred_pt_op = net_output_ops['y_pt']
+    prob_ct_op = net_output_ops['y_prob_ct']
+    prob_pt_op = net_output_ops['y_prob_pt']
     
-    pred_op = net_output_ops['y_']
-    prob_op = net_output_ops['y_prob']
-    print('pred_op shape: ', pred_op.shape)
-    print('prob_op shape: ', prob_op.shape)
-    
-    saver = tf.compat.v1.train.Saver(tf.compat.v1.global_variables(), max_to_keep=10)
+    saver = tf.compat.v1.train.Saver(tf.compat.v1.global_variables(), max_to_keep=0)
     
     config = tf.compat.v1.ConfigProto()
     config.gpu_options.allow_growth = True 
@@ -234,17 +235,16 @@ def main():
 
     if save_dir != '' and not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    
-    dices = []
+
     for idx, filename in enumerate(args.test_filenames.split(',')):
         test_filenames = pd.read_csv(
             DATA_ROOT + '/' + filename,
             dtype=object,
             keep_default_na=False,
             na_values=[]).values
-        print(test_filenames)
     
-        dice_val = []
+        dice_val_cts = []
+        dice_val_pts = []
         for f in test_filenames:
             subject_id = f[0]
             img_fn = f[1]
@@ -270,29 +270,37 @@ def main():
             image = np.concatenate([ct[...,np.newaxis],pt[...,np.newaxis]], axis=3)
             label = np.concatenate([lbl_ct[...,np.newaxis],lbl_pt[...,np.newaxis]], axis=3)
     
-            pred, prob = sess.run([pred_op, prob_op], 
+            pred_ct, pred_pt, \
+            prob_ct, prob_pt = sess.run([pred_ct_op, pred_pt_op, 
+                                         prob_ct_op, prob_pt_op], 
                             feed_dict={image_node: image[np.newaxis,...],
                                        label_node: label[np.newaxis,...],
                                        phase_train: False})
-            dice_val_ = computeDice(label[...,args.feat_index], pred[0])
-            dice_val.append(dice_val_)
+            dice_val_ct = computeDice(label[...,0], pred_ct[0])
+            dice_val_pt = computeDice(label[...,1], pred_pt[0])
+            dice_val_cts.append(dice_val_ct)
+            dice_val_pts.append(dice_val_pt)
             
             if save_dir != '':
                 case_save_dir = '{}/{}'.format(save_dir, case_name)
                 if not os.path.exists(case_save_dir):
                     os.makedirs(case_save_dir)
                 
-                new_sitk_ct = sitk.GetImageFromArray(pred[0].astype(np.int32))
+                new_sitk_ct = sitk.GetImageFromArray(pred_ct[0].astype(np.int32))
                 new_sitk_ct.CopyInformation(ct_sitk)
-                sitk.WriteImage(new_sitk_ct, str('{}/crf0_pred_{}.nii.gz'.format(case_save_dir,
-                                                                                   'ct' if args.feat_index==0 else 'pt')))
-                new_sitk_ct = sitk.GetImageFromArray(prob[0][...,1].astype(np.float32))
+                sitk.WriteImage(new_sitk_ct, str('{}/crf0_fusion2_pred_ct.nii.gz'.format(case_save_dir)))
+                new_sitk_ct = sitk.GetImageFromArray(prob_ct[0][...,1].astype(np.float32))
                 new_sitk_ct.CopyInformation(pt_sitk)
-                sitk.WriteImage(new_sitk_ct, str('{}/crf0_prob_{}.nii.gz'.format(case_save_dir,
-                                                                                   'ct' if args.feat_index==0 else 'pt')))
-        dices.append(np.mean(np.array(dice_val)))
-    print(dice_val)
-    print(dices)
+                sitk.WriteImage(new_sitk_ct, str('{}/crf0_fusion2_prob_ct.nii.gz'.format(case_save_dir)))
+                new_sitk_ct = sitk.GetImageFromArray(pred_pt[0].astype(np.int32))
+                new_sitk_ct.CopyInformation(ct_sitk)
+                sitk.WriteImage(new_sitk_ct, str('{}/crf0_fusion2_pred_pt.nii.gz'.format(case_save_dir)))
+                new_sitk_ct = sitk.GetImageFromArray(prob_pt[0][...,1].astype(np.float32))
+                new_sitk_ct.CopyInformation(pt_sitk)
+                sitk.WriteImage(new_sitk_ct, str('{}/crf0_fusion2_prob_pt.nii.gz'.format(case_save_dir)))
+
+        print(dice_val_cts, np.mean(np.array(dice_val_cts)))
+        print(dice_val_pts, np.mean(np.array(dice_val_pts)))
 
 if __name__ == '__main__':
     main()

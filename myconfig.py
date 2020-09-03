@@ -1,6 +1,7 @@
 import os
 
-DATA_ROOT = '/media/ubuntu/working/petct_mp_v2/v3/data/dataPETCT_CNN_48x48x24'
+# DATA_ROOT = '/media/ubuntu/working/petct_mp_v2/v3/data/dataPETCT_CNN_48x48x24'
+DATA_ROOT = '.'
 TRAIN_FILENAME = DATA_ROOT + '/train0.csv'
 TRAIN0_FILENAME = DATA_ROOT + '/trainForTest0.csv'
 VAL_FILENAME = DATA_ROOT + '/valForTest0.csv'

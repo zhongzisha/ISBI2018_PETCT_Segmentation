@@ -76,6 +76,21 @@ If you find this useful, please cite our work as follows:
   ISSN={},
   month={April},
 }
+
+@article{zszhong2018mp_petct,
+  author = {Zhong, Zisha and Kim, Yusung and Plichta, Kristin and Allen, Bryan G. and Zhou, Leixin and Buatti, John and Wu, Xiaodong},
+  title = {Simultaneous cosegmentation of tumors in PET-CT images using deep fully convolutional networks},
+  journal = {Medical Physics},
+  volume = {46},
+  number = {2},
+  pages = {619-633},
+  keywords = {cosegmentation, deep learning, nonsmall cell lung cancer (NSCLC), tumor contouring},
+  doi = {10.1002/mp.13331},
+  url = {https://aapm.onlinelibrary.wiley.com/doi/abs/10.1002/mp.13331},
+  eprint = {https://aapm.onlinelibrary.wiley.com/doi/pdf/10.1002/mp.13331},
+  year = {2019}
+}
+
 ```
 
 ## Contacts

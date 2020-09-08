@@ -9,8 +9,8 @@ https://aapm.onlinelibrary.wiley.com/doi/abs/10.1002/mp.13331 (MP2018), which pr
 compared to the ISBI2018 paper. 
 
 2. Uploaded our previous trained models for `CT-Only`, `PET-Only` and `DFCN-CoSeg` networks studied in 
-MP2018. The models can be downloaded in BaiduYun 
-(https://pan.baidu.com/s/1tCsjfuckkU9IH8O4xewsRQ Password: tfkt).
+MP2018. The models can be downloaded in (1) BaiduYun 
+(https://pan.baidu.com/s/1tCsjfuckkU9IH8O4xewsRQ Password: tfkt) or (2) https://app.box.com/s/9r7zxfcs5y9kr5woa1bze8v2lgz48ryv.
 
 3. As for now, I cannot install the outdated `tensorflow_gpu==1.4` in my working `Ubuntu 20.04`, 
 so I uploaded two cases of PET-CT images and the testing code using `tensorflow_gpu==2.3`, 

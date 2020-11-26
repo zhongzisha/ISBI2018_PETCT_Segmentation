@@ -18,6 +18,8 @@ so I uploaded two cases of PET-CT images and the testing code using `tensorflow_
 interested readers can check the `test.sh` script.
 **Please note that we just use the `tensorflow_gpu==2.3` in the testing code, not for training.**
 
+4. **With regarding to the PET SUV computation, please refer to the NCI-QIICR project (http://qiicr.org/tool/PETDICOM/), they have introduced an implementation as an extension for the open source 3D Slicer software (https://www.slicer.org/).**
+
 ## CT/PET Segmentation Results on One Patient
 
 ### 1. CT image
